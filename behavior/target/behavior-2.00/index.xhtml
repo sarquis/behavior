@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="author" content="R. Sarquis N.F." />
+	<title>Effugium - Behavior</title>
+	<link rel="stylesheet" type="text/css" href="resources/css/style.css" />
+	<script type="text/javascript" src="resources/js/scripts.js" />
+</h:head>
+<h:body>
+	<h:form id="form">
+
+		<ui:param name="bean" value="#{indexBean}" />
+
+		<p:growl id="growl" life="5000" showDetail="false" />
+
+		<div class="header" style="width: 1175px;">
+			<h1>{ Behavior }</h1>
+			<p align="right">
+				<p:commandLink rendered="#{bean.showMainPanel}" update="growl form"
+					action="#{bean.sair}">
+					<p:outputLabel value="{ sair }" />
+				</p:commandLink>
+			</p>
+		</div>
+
+		<p:outputPanel rendered="#{!bean.showMainPanel}">
+			<p:outputLabel value="Informe seu token:" />
+			<p:spacer width="10" height="10" />
+			<p:password value="#{bean.password}" />
+			<p:spacer width="10" height="10" />
+			<p:commandButton value="Login" update="growl form"
+				action="#{bean.login}" style="margin-right:20px;"
+				styleClass="ui-priority-primary" />
+		</p:outputPanel>
+
+		<p:outputPanel rendered="#{bean.showMainPanel}" style="width: 1175px;">
+			<ui:include src="mainPanel.xhtml" />
+			<br />
+			<p:spacer height="5" width="5" />
+			<br />
+			<p:spacer height="5" width="5" />
+		</p:outputPanel>
+
+	</h:form>
+</h:body>
+</html>

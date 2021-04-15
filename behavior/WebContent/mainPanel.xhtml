@@ -1,0 +1,138 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<ui:include src="arquivoSubPanel.xhtml" />
+
+	<p:panel header="Parâmetros de Processamento"
+		style="margin-bottom:20px"
+		footer="ATENÇÃO: Alta quantidade de execuções requer horas de processamento (aproximadamente 53 segundos por milhão, utilizando 20 sorteios).">
+
+		<h:panelGrid columns="3" cellpadding="15" style="margin-top: 0px;">
+
+			<!-- PARÂMETROS -->
+
+			<h:panelGrid columns="1"
+				style="margin-top: 0px; margin-left: 10px;     width: 270px;"
+				cellpadding="10">
+
+				<!-- Quantidade de execuções: -->
+
+				<p:column>
+					<h:outputText id="outputQtdExecucoes"
+						value="Quantidade de execuções: #{bean.mainPanel.qtdExecucoes}" />
+					<br />
+					<h:outputText value=" * 1.000.000 (em milhões)"
+						style="font-style: italic;" />
+					<h:inputHidden id="qtdDeExecucoes"
+						value="#{bean.mainPanel.qtdExecucoes}" />
+					<p:tooltip for="qtdDeExecucoesSlider"
+						value="Número de tentativas de otimização." position="right" />
+				</p:column>
+				<p:slider widgetVar="qtdDeExecucoesSlider" id="qtdDeExecucoesSlider"
+					display="outputQtdExecucoes"
+					displayTemplate="Quantidade de execuções: {value}"
+					for="qtdDeExecucoes" minValue="1" maxValue="300" />
+
+				<!-- Tamanho do pool de soluções: -->
+
+				<p:column>
+					<h:outputText id="outputPoolSolucoes"
+						value="Tamanho do pool de soluções: #{bean.mainPanel.tamanhoMemoria}" />
+					<h:inputHidden id="tamanhoDaMemoria"
+						value="#{bean.mainPanel.tamanhoMemoria}" />
+					<p:tooltip for="tamanhoDaMemoriaSlider"
+						value="Posições de memória para os melhores resultados."
+						position="right" />
+				</p:column>
+				<p:slider widgetVar="tamanhoDaMemoriaSlider"
+					id="tamanhoDaMemoriaSlider" display="outputPoolSolucoes"
+					displayTemplate="Tamanho do pool de soluções: {value}"
+					for="tamanhoDaMemoria" minValue="2" maxValue="20" />
+					
+				<!-- Número de acertos para pontuação: -->
+					
+				<p:column>
+					<h:outputText id="outputNumeroAcertos"
+						value="Número de acertos para pontuação: #{bean.mainPanel.numAcertosParaPontuacao}" />
+					<h:inputHidden id="numAcertosPontuacao"
+						value="#{bean.mainPanel.numAcertosParaPontuacao}" />
+					<p:tooltip for="numAcertosPontuacaoSlider"
+						value="Considerar sucesso somente a partir de 'x' acertos."
+						position="right" />
+				</p:column>
+				<p:slider widgetVar="numAcertosPontuacaoSlider"
+					id="numAcertosPontuacaoSlider" display="outputNumeroAcertos"
+					displayTemplate="Número de acertos para pontuação: {value}"
+					for="numAcertosPontuacao" minValue="11" maxValue="15" />
+				
+				<!-- Quantidade de números apostados: -->	
+					
+				<p:column>
+					<h:outputText id="outputQtdNumerosApostados"
+						value="Quantidade de números apostados: #{bean.mainPanel.qtdNumerosApostados}" />
+					<h:inputHidden id="qtdNumApostados"
+						value="#{bean.mainPanel.qtdNumerosApostados}" />
+					<p:tooltip for="qtdNumApostadosSlider"
+						value="Quantidade de números marcados no bilhete."
+						position="right" />
+				</p:column>
+				<p:slider widgetVar="qtdNumApostadosSlider"
+					id="qtdNumApostadosSlider" display="outputQtdNumerosApostados"
+					displayTemplate="Quantidade de números apostados: {value}"
+					for="qtdNumApostados" minValue="15" maxValue="18" />
+					
+			</h:panelGrid>
+
+			<!-- BOTÕES DE PROCESSAMENTO -->
+
+			<h:panelGrid columns="1" style="margin-top: 0px; margin-left: 10px;"
+				cellpadding="15">
+				<p:commandButton value="Iniciar Processamento"
+					update="growl soteiosSelecionados"
+					action="#{bean.mainPanel.iniciarProcessamento}"
+					onclick="behDisableAll();PF('pbAjax').start();" widgetVar="iniciar"
+					style="width: 300px;" styleClass="ui-priority-primary" />
+				<p:commandButton value="Cancelar" action="#{bean.mainPanel.cancel}"
+					widgetVar="cancelar"
+					oncomplete="PF('pbAjax').cancel();behEnableAll();"
+					style="width: 300px;" />
+				<p:progressBar widgetVar="pbAjax" ajax="true"
+					value="#{bean.mainPanel.progress}" labelTemplate="{value}%"
+					styleClass="animated" global="false">
+					<f:event type="postValidate" listener="#{bean.mainPanel.change}" />
+					<p:ajax event="complete" listener="#{bean.mainPanel.onComplete}"
+						update="growl" oncomplete="behEnableAll();" />
+				</p:progressBar>
+				<p:outputPanel>
+					<p:autoUpdate />
+					<p:outputLabel value="#{bean.mainPanel.andamento}"
+						style="filter: sepia(100%);" />
+					<br />
+					<p:outputLabel value="#{bean.mainPanel.tempoTotalDecorrido}" />
+					<br />
+					<h:graphicImage library="images" name="loading.gif" width="40"
+						style="filter: sepia(100%);" height="40"
+						rendered="#{bean.mainPanel.rodando}" />
+				</p:outputPanel>
+			</h:panelGrid>
+
+			<!-- SORTEIOS SELECIONADOS -->
+
+			<p:column>
+				<p:outputLabel value="Sorteios selecionados:" />
+				<p:inputTextarea rows="10" cols="52" readonly="true"
+					id="soteiosSelecionados"
+					value="#{bean.mainPanel.sorteiosSelecionadosEmFormatoTexto}"
+					autoResize="false" styleClass="preformatted" />
+			</p:column>
+
+		</h:panelGrid>
+
+	</p:panel>
+
+	<ui:include src="resultadoSubPanel.xhtml" />
+
+</ui:composition>

@@ -1,0 +1,681 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<p:panel header="Resultados" style="margin-bottom:20px">
+
+		<p:outputPanel style="text-align: right; margin-top:10px;">
+			<p:commandButton value="Calculador de Função" type="button"
+				onclick="PF('dlgCalculador').show();" />
+			<p:dialog header="Calculador de Função" widgetVar="dlgCalculador"
+				width="500" height="200">
+				<p:outputPanel id="calculador"
+					style="text-align: left; margin-top:10px; line-height: 25px; padding-left: 10px;">
+					<h:outputText value="Função: " />
+					<br />
+					<p:inputText value="#{bean.mainPanel.calculadorFuncao}" size="70" />
+					<br />
+					<h:outputText value="Sorteio: " />
+					<br />
+					<p:inputText value="#{bean.mainPanel.calculadorSorteio}" size="45" />
+					<br />
+					<p:commandButton value="Calcular"
+						action="#{bean.mainPanel.calcularFuncao}"
+						update="growl calculador" />
+					<br />
+					<h:outputText value="Resultado: " />
+					<br />
+					<h:outputText value="#{bean.mainPanel.calculadorResultado}"
+						style="font-family: monospace;" />
+				</p:outputPanel>
+			</p:dialog>
+		</p:outputPanel>
+
+		<h:panelGrid columns="1" cellpadding="15" style="margin-bottom:20px;">
+
+			<p:outputPanel>
+
+				<p:autoUpdate />
+
+				<!-- POOL DE SOLUÇÕES -->
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando início do processamento.">
+					<f:facet name="header">
+						<p:outputLabel>Pool de Soluções</p:outputLabel>
+						<br />
+						<p:outputLabel style="font-weight: normal;"
+							rendered="#{not bean.mainPanel.processoFinalizado}">Atualizando em tempo real.</p:outputLabel>
+					</f:facet>
+					<p:column headerText="Pontuação"
+						style="text-align: center;font-family: monospace;width: 100px;">
+						<h:outputText value="#{funcao.pontuacaoDesc}" />
+					</p:column>
+					<p:column headerText="Função"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.funcaoDesc}" />
+					</p:column>
+					<p:column headerText="11"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result11Desc}" />
+					</p:column>
+					<p:column headerText="12"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result12Desc}" />
+					</p:column>
+					<p:column headerText="13"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result13Desc}" />
+					</p:column>
+					<p:column headerText="14"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result14Desc}" />
+					</p:column>
+					<p:column headerText="15"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result15Desc}" />
+					</p:column>
+					<p:column headerText="Tempo"
+						style="text-align: center;font-family: monospace;width: 80px;">
+						<h:outputText value="#{funcao.tempoDecorrido}" />
+					</p:column>
+					<f:facet name="footer">
+						<p:outputLabel style="font-weight: normal;">Valores de referência: 11 (1/11 ~ 9,17%); 12 (1/59 ~ 1,7%); 13 (1/691 ~ 0,1%); 14 (1/21.791 ~ 0,005%); 15 (1/3.268.760 ~ 0,00003%).</p:outputLabel>
+					</f:facet>
+				</p:dataTable>
+
+				<br />
+				<p:spacer width="20" height="20" />
+				<br />
+
+				<!-- SUGESTÕES DE APOSTA -->
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento.">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;"
+							rendered="#{bean.mainPanel.processoFinalizado}">Sugestões de apostas considerando o último sorteio: #{bean.mainPanel.ultimoSorteio}</p:outputLabel>
+						<p:outputLabel style="font-weight: normal;"
+							rendered="#{not bean.mainPanel.processoFinalizado}">Sugestões de apostas. Aguardando término do processamento.</p:outputLabel>
+					</f:facet>
+					<p:column headerText="Pontuação"
+						style="text-align: center;font-family: monospace;width: 100px;">
+						<h:outputText value="#{funcao.pontuacaoDesc}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Função"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.funcaoDesc}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.sugestaoDeAposta1}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<br />
+				<p:spacer width="20" height="20" />
+				<br />
+
+				<!-- CONFERIR ANALISAR PASSADO -->
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#01 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio1}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta1}"
+							style="color: #{funcao.corResultado1}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio1}"
+							style="color: #{funcao.corResultado1}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#02 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio2}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta2}"
+							style="color: #{funcao.corResultado2}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio2}"
+							style="color: #{funcao.corResultado2}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#03 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio3}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta3}"
+							style="color: #{funcao.corResultado3}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio3}"
+							style="color: #{funcao.corResultado3}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#04 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio4}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta4}"
+							style="color: #{funcao.corResultado4}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio4}"
+							style="color: #{funcao.corResultado4}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#05 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio5}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta5}"
+							style="color: #{funcao.corResultado5}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio5}"
+							style="color: #{funcao.corResultado5}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#06 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio6}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta6}"
+							style="color: #{funcao.corResultado6}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio6}"
+							style="color: #{funcao.corResultado6}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#07 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio7}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta7}"
+							style="color: #{funcao.corResultado7}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio7}"
+							style="color: #{funcao.corResultado7}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#08 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio8}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta8}"
+							style="color: #{funcao.corResultado8}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio8}"
+							style="color: #{funcao.corResultado8}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#09 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio9}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta9}"
+							style="color: #{funcao.corResultado9}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio9}"
+							style="color: #{funcao.corResultado9}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao" value="#{bean.mainPanel.funcaoTopList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#10 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio10}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta10}"
+							style="color: #{funcao.corResultado10}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio10}"
+							style="color: #{funcao.corResultado10}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+
+				<br />
+				<p:spacer width="20" height="20" />
+				<p:separator />
+				<br />
+				<p:spacer width="20" height="20" />
+
+				<!-- POOL DE SOLUÇÕES * FUNÇÕES PARA REFERÊNCIA * -->
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando início do processamento.">
+					<f:facet name="header">
+						<p:outputLabel>* FUNÇÕES PARA REFERÊNCIA - ALEATÓRIO * Pool de Soluções</p:outputLabel>
+					</f:facet>
+					<p:column headerText="Pontuação"
+						style="text-align: center;font-family: monospace;width: 100px;">
+						<h:outputText value="#{funcao.pontuacaoDesc}" />
+					</p:column>
+					<p:column headerText="Função"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.funcaoDesc}" />
+					</p:column>
+					<p:column headerText="11"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result11Desc}" />
+					</p:column>
+					<p:column headerText="12"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result12Desc}" />
+					</p:column>
+					<p:column headerText="13"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result13Desc}" />
+					</p:column>
+					<p:column headerText="14"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result14Desc}" />
+					</p:column>
+					<p:column headerText="15"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.result15Desc}" />
+					</p:column>
+					<p:column headerText="Tempo"
+						style="text-align: center;font-family: monospace;width: 80px;">
+						<h:outputText value="#{funcao.tempoDecorrido}" />
+					</p:column>
+				</p:dataTable>
+
+				<br />
+				<p:spacer width="20" height="20" />
+				<br />
+
+				<!-- CONFERIR ANALISAR PASSADO COM FUNÇÕES PARA REFERÊNCIA -->
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#01 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio1}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta1}"
+							style="color: #{funcao.corResultado1}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio1}"
+							style="color: #{funcao.corResultado1}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#02 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio2}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta2}"
+							style="color: #{funcao.corResultado2}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio2}"
+							style="color: #{funcao.corResultado2}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#03 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio3}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta3}"
+							style="color: #{funcao.corResultado3}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio3}"
+							style="color: #{funcao.corResultado3}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#04 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio4}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta4}"
+							style="color: #{funcao.corResultado4}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio4}"
+							style="color: #{funcao.corResultado4}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#05 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio5}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta5}"
+							style="color: #{funcao.corResultado5}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio5}"
+							style="color: #{funcao.corResultado5}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#06 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio6}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta6}"
+							style="color: #{funcao.corResultado6}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio6}"
+							style="color: #{funcao.corResultado6}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#07 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio7}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta7}"
+							style="color: #{funcao.corResultado7}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio7}"
+							style="color: #{funcao.corResultado7}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#08 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio8}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta8}"
+							style="color: #{funcao.corResultado8}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio8}"
+							style="color: #{funcao.corResultado8}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#09 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio9}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta9}"
+							style="color: #{funcao.corResultado9}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio9}"
+							style="color: #{funcao.corResultado9}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<p:dataTable var="funcao"
+					value="#{bean.mainPanel.funcaoParaReferenciaList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">#10 </p:outputLabel>
+						<ui:include src="resultadoSubPanel_partHeader.xhtml" />
+						<p:outputLabel style="font-weight: normal;">#{bean.mainPanel.proximoSorteio10}</p:outputLabel>
+					</f:facet>
+					<ui:include src="resultadoSubPanel_partColumn.xhtml" />
+					<p:column headerText="Aposta"
+						style="text-align: center;font-family: monospace;width: 420px;">
+						<h:outputText value="#{funcao.sugestaoDeAposta10}"
+							style="color: #{funcao.corResultado10}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Acertos"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{funcao.resultadoProximoSorteio10}"
+							style="color: #{funcao.corResultado10}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+				<br />
+				<p:spacer width="20" height="20" />
+				<br />
+
+				<p:dataTable var="resultado" value="#{bean.mainPanel.resultadoList}"
+					emptyMessage="Aguardando processamento."
+					rendered="#{bean.mainPanel.analisarPassado}">
+					<f:facet name="header">
+						<p:outputLabel style="font-weight: normal;">Analisar o passado - Resultado Final</p:outputLabel>
+					</f:facet>
+					<p:column headerText="Função Calculada"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{resultado.resultadoCalculado}"
+							style="color: #{resultado.corCalculado}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+					<p:column headerText="Função Aleatória"
+						style="text-align: center;font-family: monospace;">
+						<h:outputText value="#{resultado.resultadoAleatorio}"
+							style="color: #{resultado.corAleatorio}"
+							rendered="#{bean.mainPanel.processoFinalizado}" />
+					</p:column>
+				</p:dataTable>
+
+			</p:outputPanel>
+
+		</h:panelGrid>
+
+	</p:panel>
+
+</ui:composition>

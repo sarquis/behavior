@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+	
+	<p:column headerText="Pontuação"
+		style="text-align: center;font-family: monospace;width: 100px;">
+		<h:outputText value="#{funcao.pontuacaoDesc}"
+			rendered="#{bean.mainPanel.processoFinalizado}" />
+	</p:column>
+	<p:column headerText="Função"
+		style="text-align: center;font-family: monospace;width: 420px;">
+		<h:outputText value="#{funcao.funcaoDesc}"
+			rendered="#{bean.mainPanel.processoFinalizado}" />
+	</p:column>
+	
+</ui:composition>

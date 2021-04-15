@@ -1,0 +1,104 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<p:panel header="Arquivo dos Sorteios"
+		footer="OBS: Os números sorteados estão ordenados de forma ascendente."
+		style="margin-bottom:20px">
+
+		<h:panelGrid columns="3" cellpadding="15" style="margin-top:20px;">
+
+			<!-- ARQUIVO DE SORTEIOS -->
+
+			<p:column>
+				<p:inputTextarea rows="10" cols="52" readonly="true"
+					id="sorteiosTextarea"
+					value="#{bean.mainPanel.sorteiosEmFormatoTexto}" autoResize="false"
+					styleClass="preformatted" />
+				<br />
+				<p:spacer height="40" width="40" />
+			</p:column>
+
+			<!-- DOWNLOAD E UPLOAD -->
+
+			<h:panelGrid columns="1" id="downloadUpload">
+				<h:outputText
+					value="Quantidade de sorteios carregados: #{bean.mainPanel.qtdSorteiosCarregados}" />
+				<h:panelGrid columns="1" cellpadding="8">
+					<p:commandButton widgetVar="download" value="Download" ajax="false">
+						<p:fileDownload value="#{bean.mainPanel.file}" />
+					</p:commandButton>
+					<p:column>
+						<h:outputText value="Carregar um novo arquivo de sorteios:"
+							style="line-height: 22px;" />
+						<br />
+						<p:fileUpload widgetVar="uploadWV" label="Selecionar"
+							listener="#{bean.mainPanel.handleFileUpload}" mode="advanced"
+							dragDropSupport="false"
+							update="growl downloadUpload sorteiosTextarea"
+							fileLimitMessage="Somente um arquivo por envio é suportado."
+							invalidFileMessage="Somente arquivo .csv é suportado."
+							invalidSizeMessage="Somente arquivos com menos de 500 KB são suportados."
+							sizeLimit="500000" fileLimit="1" allowTypes="/(\.|\/)(csv)$/" />
+					</p:column>
+				</h:panelGrid>
+			</h:panelGrid>
+
+			<!-- SELEÇÃO DOS SORTEIOS -->
+
+			<h:panelGrid columns="1">
+				<h:outputText value="Seleção de conjunto para processamento:" />
+				<h:panelGrid columns="1"
+					style="margin-top: 10px; margin-left: 10px;">
+					<p:outputPanel style="padding-bottom: 10px;">
+						<h:outputText id="outputQtdSorteios" style="padding-bottom: 10px;"
+							value="Quantidade de sorteios: #{bean.mainPanel.qtdSorteiosParaProcessamento}" />
+						<h:inputHidden id="qtdSorteiosParaProcessamento"
+							value="#{bean.mainPanel.qtdSorteiosParaProcessamento}" />
+						<p:spacer width="120" height="20" />
+					</p:outputPanel>
+					<p:column>
+						<p:slider widgetVar="qtdSorteiosParaProcessamentoSlider"
+							id="qtdSorteiosParaProcessamentoSlider"
+							display="outputQtdSorteios"
+							displayTemplate="Quantidade de sorteios: {value}"
+							for="qtdSorteiosParaProcessamento" minValue="05" maxValue="80" />
+						<p:tooltip for="qtdSorteiosParaProcessamentoSlider"
+							value="Número de sorteios que serão utilizados." position="left" />
+					</p:column>
+					<p:outputPanel id="labelUltimosSorteios" style="padding-top: 10px;">
+						<h:outputText value="* Utilizando os últimos sorteios."
+							style="font-style: italic;"
+							rendered="#{not bean.mainPanel.analisarPassado}" />
+						<h:outputText value="_______________________________"
+							style="visibility: hidden"
+							rendered="#{bean.mainPanel.analisarPassado}" />
+					</p:outputPanel>
+					<h:panelGrid columns="2"
+						style="margin-top: 20px; margin-left: 10px; vertical-align: middle;">
+						<h:outputText value="Analisar o passado: " />
+						<p:toggleSwitch value="#{bean.mainPanel.analisarPassado}">
+							<p:ajax update="labelUltimosSorteios inputUltimosSorteios" />
+						</p:toggleSwitch>
+					</h:panelGrid>
+					<h:panelGrid columns="1"
+						style="margin-top: 2px; margin-left: 10px; vertical-align: middle;">
+						<p:outputPanel id="inputUltimosSorteios">
+							<p:column rendered="#{bean.mainPanel.analisarPassado}">
+								<h:outputText value="Sorteio a considerar como último: " />
+								<p:spacer width="5" />
+								<p:inputMask value="#{bean.mainPanel.sorteioConsiderarUltimo}"
+									mask="9999" size="4" />
+							</p:column>
+						</p:outputPanel>
+					</h:panelGrid>
+				</h:panelGrid>
+			</h:panelGrid>
+
+		</h:panelGrid>
+
+	</p:panel>
+
+</ui:composition>
